@@ -1,0 +1,37 @@
+
+from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+# Storage for attendance
+attendance_data = {"college": "", "teacher": "", "students": []}
+
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        # Get college and teacher names
+        attendance_data["college"] = request.form["college_name"]
+        attendance_data["teacher"] = request.form["teacher_name"]
+        return redirect(url_for("attendance"))
+    return render_template("index.html")
+
+
+@app.route("/attendance", methods=["GET", "POST"])
+def attendance():
+    if request.method == "POST":
+        # Get student names
+        student_name = request.form["student_name"]
+        attendance_data["students"].append(student_name)
+        return redirect(url_for("success"))
+    return render_template("attendance.html", college=attendance_data["college"], teacher=attendance_data["teacher"])
+
+
+@app.route("/success")
+def success():
+    return render_template("success.html", data=attendance_data)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
